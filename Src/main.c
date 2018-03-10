@@ -78,7 +78,11 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  FIL MyFile;     /* File object */
+  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t rtext[100];                                   /* File read buffer */
+  FRESULT res;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -102,7 +106,23 @@ int main(void)
   MX_FATFS_Init();
 
   /* USER CODE BEGIN 2 */
+  res = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+  printf("f_open() res=%d\n", (int)res);
+  if (res == FR_OK) {
+    res = f_write(&MyFile, wtext, sizeof(wtext), (void *)&byteswritten);
+    printf("f_write() res=%d, byteswritten=%lu\n", (int)res, byteswritten);
+    f_close(&MyFile);
+  }
 
+  res = f_open(&MyFile, "STM32.TXT", FA_READ);
+  printf("open() res=%d\n", (int)res);
+  if (res == FR_OK) {
+    res = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+    printf("f_read() res=%d, bytesread=%lu, rtext=%s\n", (int)res, byteswritten, rtext);
+    f_close(&MyFile);
+  }
+
+  FATFS_UnLinkDriver(USERPath);
   /* USER CODE END 2 */
 
   /* Infinite loop */
